@@ -5,9 +5,8 @@ python-dotenv
 langchain
 langchain-community
 langchain-core
-langchain-chroma
-ollama
-chromadb
+langchain-groq
+faiss-cpu
 pypdf
 fpdf2
 requests
