@@ -1,0 +1,14 @@
+flask
+flask-sqlalchemy
+werkzeug
+python-dotenv
+langchain
+langchain-community
+langchain-core
+langchain-chroma
+ollama
+chromadb
+pypdf
+fpdf2
+requests
+googletrans==3.1.0a0
