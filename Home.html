@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SehatSathiAI - Your Virtual First Doctor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --g1: #052818;
+      --g2: #064e2b;
+      --green: #22c55e;
+      --green-light: #86efac;
+      --green-mid: #16a34a;
+      --cyan: #00e5c3;
+      --glass: rgba(255,255,255,0.09);
+      --glass-md: rgba(255,255,255,0.14);
+      --glass-border: rgba(255,255,255,0.20);
+      --text: #ffffff;
+      --muted: rgba(255,255,255,0.62);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--g1);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 75% 55% at 88% 8%,  rgba(134,239,172,0.32) 0%, transparent 58%),
+        radial-gradient(ellipse 60% 70% at 8%  90%, rgba(21,128,61,0.50)   0%, transparent 58%),
+        radial-gradient(ellipse 100% 100% at 50% 50%, #064e2b 0%, #052818 100%);
+    }
+
+    /* ── FLOATING SHAPES ── */
+    .shapes { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .shape { position: absolute; border: 1.5px solid rgba(255,255,255,0.10); }
+    .sq { border-radius: 8px; }
+    .ci { border-radius: 50%; }
+
+    .sh1 { width:88px;  height:88px;  top:12%; left:6%;         transform:rotate(15deg); animation: fl1 9s  ease-in-out infinite; }
+    .sh2 { width:52px;  height:52px;  top:64%; left:4%;         transform:rotate(35deg); animation: fl2 11s ease-in-out infinite; }
+    .sh3 { width:110px; height:110px; top:16%; right:4%;        transform:rotate(-18deg);animation: fl1 13s ease-in-out infinite reverse; }
+    .sh4 { width:42px;  height:42px;  bottom:18%; right:8%;     transform:rotate(45deg); animation: fl2 7s  ease-in-out infinite; }
+    .sh5 { width:78px;  height:78px;  top:52%; right:6%;        animation: fl1 10s ease-in-out infinite; }
+    .sh6 { width:56px;  height:56px;  bottom:30%; left:10%;     animation: fl2 9s  ease-in-out infinite; }
+
+    @keyframes fl1 { 0%,100%{transform:rotate(15deg) translateY(0)}  50%{transform:rotate(15deg) translateY(-20px)} }
+    @keyframes fl2 { 0%,100%{transform:rotate(35deg) translateY(0)}  50%{transform:rotate(35deg) translateY(16px)}  }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 36px; margin: 16px 20px 0;
+      background: rgba(255,255,255,0.09);
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 1.3rem; font-weight: 800; color: #fff; text-decoration: none;
+    }
+    .brand-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, #22c55e, #86efac);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; box-shadow: 0 4px 14px rgba(34,197,94,0.40);
+    }
+    .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none;
+      font-size: 0.93rem; font-weight: 500;
+      padding: 8px 18px; border-radius: 12px; transition: all 0.2s;
+    }
+    .nav-links a:hover { background: rgba(255,255,255,0.12); color: #fff; }
+    .nav-links a.active { background: rgba(34,197,94,0.25); color: #86efac; }
+    .btn-launch {
+      padding: 10px 22px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border: none; border-radius: 12px; color: #fff;
+      font-family: 'Outfit', sans-serif; font-size: 0.93rem; font-weight: 700;
+      cursor: pointer; text-decoration: none;
+      box-shadow: 0 4px 16px rgba(34,197,94,0.35);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .btn-launch:hover { opacity: 0.88; transform: translateY(-1px); color: #fff; }
+
+    /* ── SECTIONS ── */
+    section { position: relative; z-index: 1; padding: 100px 80px; }
+    section.hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: center; text-align: center; padding-top: 120px;
+    }
+
+    /* ── HERO ── */
+    .hero-label {
+      font-size: 0.78rem; letter-spacing: 0.32em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 22px;
+      display: flex; align-items: center; justify-content: center; gap: 14px;
+    }
+    .hero-label::before, .hero-label::after {
+      content: ''; width: 64px; height: 1px;
+      background: rgba(134,239,172,0.45);
+    }
+    .hero-title {
+      font-size: clamp(3.2rem, 6.5vw, 5.5rem); font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 30%, #86efac 80%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 22px; line-height: 1.05;
+    }
+    .hero-desc {
+      font-size: 1.05rem; color: var(--muted);
+      max-width: 520px; margin: 0 auto 52px; line-height: 1.78;
+    }
+
+    /* stats row */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 14px; max-width: 820px; margin: 0 auto 48px;
+    }
+    .stat-card {
+      background: var(--glass); backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px; padding: 26px 16px; text-align: center;
+      transition: transform 0.3s, background 0.3s;
+    }
+    .stat-card:hover { transform: translateY(-6px); background: var(--glass-md); }
+    .stat-value { font-size: 1.55rem; font-weight: 800; color: #86efac; line-height: 1.1; margin-bottom: 6px; }
+    .stat-label { font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+
+    /* CTA buttons — pill shaped like screenshots */
+    .cta-row { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
+    .btn-cta-primary {
+      padding: 16px 40px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border: none; border-radius: 50px; color: #fff;
+      font-family: 'Outfit', sans-serif; font-size: 0.9rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      cursor: pointer; text-decoration: none;
+      box-shadow: 0 6px 24px rgba(34,197,94,0.42);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .btn-cta-primary:hover { opacity: 0.88; transform: translateY(-2px); color: #fff; }
+    .btn-cta-outline {
+      padding: 16px 40px;
+      background: rgba(255,255,255,0.07);
+      border: 1.5px solid rgba(255,255,255,0.30);
+      border-radius: 50px; color: #fff;
+      font-family: 'Outfit', sans-serif; font-size: 0.9rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      cursor: pointer; text-decoration: none;
+      backdrop-filter: blur(10px);
+      transition: background 0.2s, transform 0.2s;
+    }
+    .btn-cta-outline:hover { background: rgba(255,255,255,0.14); transform: translateY(-2px); color: #fff; }
+
+    /* ── SECTION HEADERS ── */
+    .section-title { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; color: var(--cyan); margin-bottom: 12px;text-align:center; }
+    .section-underline { width: 80px; height: 3px; background: linear-gradient(90deg, var(--green), transparent); border-radius: 4px; margin: 0 auto 56px auto; }
+
+  /* ── CORE FEATURES ── */
+
+/* ── CORE FEATURES ── */
+
+#features{
+  padding-top:80px;
+}
+
+.feature-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:50px;
+  align-items:center;
+  margin-bottom:120px;
+}
+
+/* ───────── LEFT DIAGONAL CARD ───────── */
+
+.feature-card{
+  position:relative;
+
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(18px);
+
+  border:1px solid rgba(255,255,255,0.12);
+
+  padding:55px 48px;
+
+  min-height:340px;
+
+  overflow:hidden;
+
+  /* DIAGONAL SHAPE */
+  transform: skewX(-8deg);
+  border-radius: 40px;
+
+
+  transition:
+    transform .4s ease,
+    box-shadow .4s ease,
+    background .3s ease;
+}
+
+/* top futuristic line */
+
+.feature-card::before{
+  content:'';
+
+  position:absolute;
+
+  top:28px;
+  right:45px;
+
+  width:120px;
+  height:2px;
+
+  background:rgba(134,239,172,0.45);
+}
+
+/* hover */
+
+.feature-card:hover{
+  transform:translateY(-10px);
+
+  background:rgba(255,255,255,0.08);
+
+  box-shadow:
+    0 20px 60px rgba(34,197,94,0.18);
+}
+
+/* ───────── RIGHT NORMAL IMAGE ───────── */
+
+.feature-img{
+  position:relative;
+
+  height:280px;
+
+  overflow:hidden;
+
+  border-radius:24px;
+
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:
+    transform .4s ease,
+    box-shadow .4s ease;
+}
+
+.feature-img::before{
+  content:'';
+
+  position:absolute;
+
+  inset:0;
+
+  pointer-events:none;
+}
+
+.feature-img:hover{
+  transform:translateY(-10px);
+}
+
+.feature-img svg{
+  width:100%;
+  height:100%;
+}
+
+/* ───────── TEXT ───────── */
+
+.feature-title{
+  font-size:2rem;
+  font-weight:800;
+  color:#fff;
+
+  margin-bottom:18px;
+}
+
+.feature-desc{
+  font-size:1rem;
+  line-height:1.9;
+
+  color:var(--muted);
+
+  max-width:420px;
+}
+
+/* ───────── ICONS ───────── */
+
+.icon-steth{
+  margin-bottom:28px;
+}
+
+.pink-sq{
+  width:58px;
+  height:58px;
+
+  border-radius:14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ec4899,
+      #f43f5e
+    );
+
+  box-shadow:
+    0 8px 24px rgba(236,72,153,0.35);
+
+  margin-bottom:28px;
+}
+
+    /* ── TECHNOLOGIES ── */
+    #technologies { padding-top: 80px; }
+    .tech-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 30px; margin-bottom: 54px;
+    }
+    .tech-grid-row2 {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 30px; max-width: calc(50% - 10px);
+      margin: 0 auto;
+    }
+    .tech-card {
+      background: var(--glass); backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      width: 250px;height: 300px; border-radius: 20px; padding: 50px 20px; text-align: center;
+      transition: transform 0.4s cubic-bezier(0.34,1.60,0.64,1), background 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+      transform :rotate(15deg);
+    }
+    
+    /* On hover: straighten to original upright shape */
+    .tech-card:hover {
+      transform: rotate(0deg) translateY(-12px) scale(1.03);
+      background: var(--glass-md);
+      box-shadow: 0 16px 40px rgba(34,197,94,0.28);
+      border-color: rgba(34,197,94,0.45);
+    }
+      
+    .tech-icon { font-size: 2.55rem; margin-bottom: 16px; display: block;transform :rotate(-15deg); }
+    .tech-name { font-size: 1.55rem; font-weight: 700; color: #fff; margin-bottom: 10px;transform :rotate(-15deg);; }
+    .tech-desc { font-size: 1.00rem; color: var(--muted); line-height: 1.65;transform :rotate(-15deg);; }
+     
+     .tech-card:hover .tech-icon,
+     .tech-card:hover .tech-name,
+     .tech-card:hover .tech-desc {
+            transform: rotate(0deg);
+     }
+   /* ── OUR MISSION — two-column timeline like screenshots 7 & 8 ── */
+    #our-mission { padding-top: 80px; }
+   .mission-layout{
+    display: grid;
+    grid-template-columns: 360px 50px 360px;
+    justify-content: center;
+    align-items: stretch;
+    gap: 0px;
+    margin: 100px auto 0 auto;
+    width: fit-content;
+    position: relative;
+  }
+
+    /* left & right columns */
+    .mission-left  { display: flex; flex-direction: column; gap: 28px; align-items:flex-end; }
+    .mission-right { display: flex; flex-direction: column; gap: 28px;; padding-top: 180px; }
+    .mission-left .mission-card:nth-child(2){ margin-top: 180px;}
+    .mission-right .mission-card:nth-child(2){ margin-top: 180px;}
+    .mission-left .mission-card:first-child{margin-top: -50px;}
+    .mission-card {
+      background: var(--glass); backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;  width:100%;height: 240px;padding: 32px 30px;transition: all 0.5s cubic-bezier(0.22,1,0.36,1);opacity:0;transform: translateY(120px);
+    }
+
+    .mission-card:nth-child(1){transition-delay: 0.1s;}
+    .mission-card:nth-child(2){transition-delay: 0.3s;}
+
+    /* visible animation state */
+    .mission-card.show{opacity: 1;transform: translateY(0);}
+    
+    .mission-tag     { font-size: 1.5rem; font-weight: 600; color: var(--green-light); margin-bottom: 10px; }
+    .mission-heading { font-size: 1.2rem;  font-weight: 700; color: #fff; margin-bottom: 12px; }
+    .mission-text    { font-size: 0.90rem; color: var(--muted); line-height: 1.75; }
+
+    /* center line column */
+    .mission-center {
+      display: flex; flex-direction: column; align-items: center;
+      position:relative;
+    }
+    .m-dot {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 14px var(--green);
+      flex-shrink: 0; z-index: 2;
+    }
+    .m-line {
+      width: 3px; height: 220px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.7), rgba(255,255,255,0.1));
+    }
+   .mission-card:hover{
+   transform: translateY(-8px);
+   box-shadow: 0 14px 34px rgba(255,105,180,0.22);
+   }
+    /* decorative diamond — like image 7 */
+    .mission-diamond {
+      position: absolute;
+      width: 60px; height: 60px;
+      border: 1.5px solid rgba(255,255,255,0.12);
+      border-radius: 6px; transform: rotate(45deg);
+      left: calc(50% - 90px); top: 55%;
+      pointer-events: none; opacity: 0.35;
+    }
+   
+    /* ── ABOUT ── */
+    #about { padding-top: 80px; }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+    .about-card, .team-card {
+      background: var(--glass); backdrop-filter: blur(18px);
+      border: 1px solid var(--glass-border);
+      border-radius: 22px; padding: 42px;
+    }
+    .about-title { font-size: 1.6rem; font-weight: 800; color: var(--green-light); margin-bottom: 20px; }
+    .about-text  { font-size: 0.9rem; color: var(--muted); line-height: 1.82; margin-bottom: 16px; }
+    .team-title  { font-size: 1rem; font-weight: 600; color: var(--muted); margin-bottom: 24px; }
+    .team-grid   { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .team-member { text-align: center; }
+    .member-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(34,197,94,0.14); border: 1px solid rgba(34,197,94,0.32);
+      border-radius: 20px; padding: 7px 14px;
+      font-size: 0.78rem; color: #86efac; margin-bottom: 9px;
+    }
+    .member-name { font-size: 0.9rem; font-weight: 600; color: #fff; margin-bottom: 4px; }
+    .member-role { font-size: 0.78rem; color: var(--muted); }
+    .team-single { grid-column: 1/-1; margin-top: 14px; }
+
+    footer {
+      position: relative; z-index: 1; text-align: center;
+      padding: 28px; color: var(--muted); font-size: 0.84rem;
+      border-top: 1px solid rgba(255,255,255,0.10);
+    }
+    footer span { color: #86efac; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<div class="shapes">
+  <div class="shape sq sh1"></div><div class="shape sq sh2"></div>
+  <div class="shape sq sh3"></div><div class="shape sq sh4"></div>
+  <div class="shape ci sh5"></div><div class="shape ci sh6"></div>
+</div>
+
+<!-- ══ NAVBAR ══ -->
+<nav class="navbar">
+  <a href="/home" class="nav-brand">
+    <div class="brand-icon">🌿</div>SehatSathi AI
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features"                   onclick="setActive(this)">Features</a></li>
+    <li><a href="#technologies"               onclick="setActive(this)">Technologies</a></li>
+    <li><a href="#our-mission"                onclick="setActive(this)">Our Mission</a></li>
+    <li><a href="#about"                      onclick="setActive(this)">About</a></li>
+  </ul>
+  <a href="/login" class="btn-launch">Launch App ↗</a>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero" id="hero">
+  <div class="hero-label">Virtual First Doctor for Safe Healthcare</div>
+  <h1 class="hero-title">SehatSathi AI</h1>
+  <p class="hero-desc">An intelligent medical assistant built for India. Speak in Hindi or Odia, check drug interactions, get AI diagnosis, analyze prescriptions — all in one place, 24/7.</p>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-value">6+</div><div class="stat-label">AI Features</div></div>
+    <div class="stat-card"><div class="stat-value">24/7</div><div class="stat-label">Accessibility</div></div>
+    <div class="stat-card"><div class="stat-value">🌐</div><div class="stat-label">Multi-Language</div></div>
+    <div class="stat-card"><div class="stat-value">FDA</div><div class="stat-label">Drug Safety</div></div>
+  </div>
+  <div class="cta-row">
+    <a href="/assistant" class="btn-cta-primary">Launch AI Assistant</a>
+    <a href="/features"  class="btn-cta-outline">Explore Features</a>
+  </div>
+</section>
+
+<!-- ══ CORE FEATURES ══ -->
+<section id="features">
+  <h2 class="section-title">Core Features</h2>
+  <div class="section-underline"></div>
+
+  <!-- Feature 1: AI Disease Prediction — text left, image right -->
+  <div class="feature-row">
+    <div class="feature-card">
+      <div class="icon-steth">
+        <!-- Stethoscope icon matching reference image (pink/rose color) -->
+        <svg width="58" height="58" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- stethoscope tubes -->
+          <path d="M14 8C14 8 10 8 10 15V28C10 37.389 17.611 45 27 45" stroke="#ec4899" stroke-width="3" stroke-linecap="round"/>
+          <path d="M38 8C38 8 42 8 42 15V28C42 37.389 34.389 45 25 45" stroke="#ec4899" stroke-width="3" stroke-linecap="round"/>
+          <!-- ear tubes caps -->
+          <circle cx="10" cy="10" r="3.5" fill="#ec4899" opacity="0.85"/>
+          <circle cx="42" cy="10" r="3.5" fill="#ec4899" opacity="0.85"/>
+          <!-- connecting arch to chest piece -->
+          <path d="M27 45 C27 45 27 50 32 50 C37 50 37 44 37 44" stroke="#ec4899" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <!-- chest piece (circle) -->
+          <circle cx="43" cy="44" r="7" stroke="#ec4899" stroke-width="2.8"/>
+          <circle cx="43" cy="44" r="3" fill="#ec4899" opacity="0.7"/>
+          <!-- small coil detail -->
+          <path d="M37 44 Q40 38 43 44" stroke="#ec4899" stroke-width="1.8" fill="none" opacity="0.6"/>
+        </svg>
+      </div>
+      <div class="feature-title">AI Disease Prediction</div>
+      <p class="feature-desc">Enter your symptoms and our AI will conduct a guided conversation to predict possible illnesses and suggest safe, generic over-the-counter remedies.</p>
+    </div>
+    <div class="feature-img">
+      <!-- Reference image: neural network / AI nodes connecting to mini panels (AI label, waveform, bar chart) -->
+      <svg viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="bg1" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#22c55e" stop-opacity="0.22"/>
+            <stop offset="100%" stop-color="#052818" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="glow1"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="glow2"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <rect width="500" height="320" fill="#041f14" rx="20"/>
+        <ellipse cx="250" cy="160" rx="210" ry="130" fill="url(#bg1)"/>
+
+        <!-- Central neural hub — large glowing node like reference -->
+        <circle cx="230" cy="160" r="48" fill="rgba(34,197,94,0.08)" stroke="rgba(134,239,172,0.20)" stroke-width="1.5"/>
+        <circle cx="230" cy="160" r="32" fill="rgba(34,197,94,0.12)" stroke="rgba(134,239,172,0.30)" stroke-width="1.5"/>
+        <!-- hub inner nodes connected like reference droplet/tentacle shape -->
+        <g filter="url(#glow1)">
+          <!-- central hub -->
+          <circle cx="230" cy="160" r="14" fill="rgba(34,197,94,0.30)" stroke="#86efac" stroke-width="2"/>
+          <circle cx="230" cy="160" r="7"  fill="#22c55e"/>
+          <!-- satellite nodes around hub -->
+          <circle cx="230" cy="118" r="8"  fill="#00e5c3" opacity="0.9"/>
+          <circle cx="268" cy="138" r="7"  fill="#86efac" opacity="0.9"/>
+          <circle cx="268" cy="182" r="7"  fill="#86efac" opacity="0.9"/>
+          <circle cx="230" cy="202" r="8"  fill="#00e5c3" opacity="0.9"/>
+          <circle cx="192" cy="182" r="7"  fill="#86efac" opacity="0.9"/>
+          <circle cx="192" cy="138" r="7"  fill="#86efac" opacity="0.9"/>
+        </g>
+        <!-- spokes from hub to satellites -->
+        <g stroke="rgba(134,239,172,0.45)" stroke-width="1.5">
+          <line x1="230" y1="146" x2="230" y2="126"/>
+          <line x1="242" y1="150" x2="262" y2="143"/>
+          <line x1="242" y1="170" x2="262" y2="177"/>
+          <line x1="230" y1="174" x2="230" y2="194"/>
+          <line x1="218" y1="170" x2="198" y2="177"/>
+          <line x1="218" y1="150" x2="198" y2="143"/>
+        </g>
+
+        <!-- outer connection lines (to panels) -->
+        <g stroke="rgba(34,197,94,0.25)" stroke-width="1.2">
+          <!-- to left sphere -->
+          <line x1="182" y1="160" x2="110" y2="160"/>
+          <!-- to top-right AI panel -->
+          <line x1="268" y1="130" x2="340" y2="72"/>
+          <!-- to bottom-right bar chart panel -->
+          <line x1="268" y1="190" x2="340" y2="248"/>
+          <!-- to left small node cluster -->
+          <line x1="192" y1="160" x2="105" y2="120"/>
+          <line x1="192" y1="160" x2="105" y2="200"/>
+        </g>
+
+        <!-- left large sphere (neural ball like reference) -->
+        <circle cx="82" cy="160" r="38" fill="rgba(0,229,195,0.06)" stroke="rgba(0,229,195,0.20)" stroke-width="1.5"/>
+        <circle cx="82" cy="160" r="24" fill="rgba(0,229,195,0.10)" stroke="rgba(0,229,195,0.28)" stroke-width="1.2"/>
+        <g filter="url(#glow1)">
+          <circle cx="82" cy="160" r="9" fill="#00e5c3" opacity="0.85"/>
+          <circle cx="62" cy="148" r="5" fill="#22c55e" opacity="0.8"/>
+          <circle cx="102" cy="148" r="5" fill="#22c55e" opacity="0.8"/>
+          <circle cx="62" cy="172" r="5" fill="#22c55e" opacity="0.8"/>
+          <circle cx="102" cy="172" r="5" fill="#22c55e" opacity="0.8"/>
+        </g>
+        <g stroke="rgba(0,229,195,0.35)" stroke-width="1.2">
+          <line x1="82" y1="151" x2="82" y2="136"/>
+          <line x1="75"  y1="154" x2="66" y2="150"/>
+          <line x1="75"  y1="166" x2="66" y2="170"/>
+          <line x1="89"  y1="154" x2="98" y2="150"/>
+          <line x1="89"  y1="166" x2="98" y2="170"/>
+          <line x1="82" y1="169" x2="82" y2="184"/>
+        </g>
+
+        <!-- top-right: AI label panel (like reference) -->
+        <rect x="338" y="30" width="130" height="72" rx="12" fill="rgba(34,197,94,0.10)" stroke="rgba(134,239,172,0.35)" stroke-width="1.5"/>
+        <text x="358" y="58" font-size="13" fill="#86efac" font-family="Outfit" font-weight="700" opacity="0.9">AI</text>
+        <!-- waveform inside AI panel -->
+        <g fill="#86efac" opacity="0.70">
+          <rect x="380" y="44" width="4" height="14" rx="2"/>
+          <rect x="388" y="39" width="4" height="24" rx="2"/>
+          <rect x="396" y="47" width="4" height="8"  rx="2"/>
+          <rect x="404" y="36" width="4" height="30" rx="2"/>
+          <rect x="412" y="49" width="4" height="6"  rx="2"/>
+          <rect x="420" y="42" width="4" height="20" rx="2"/>
+          <rect x="428" y="46" width="4" height="12" rx="2"/>
+          <rect x="436" y="38" width="4" height="28" rx="2"/>
+          <rect x="444" y="50" width="4" height="8"  rx="2"/>
+          <rect x="452" y="44" width="4" height="16" rx="2"/>
+        </g>
+
+        <!-- bottom-right: AI report panel (like reference) -->
+        <rect x="338" y="218" width="130" height="72" rx="12" fill="rgba(34,197,94,0.10)" stroke="rgba(134,239,172,0.35)" stroke-width="1.5"/>
+        <!-- AI chip icon inside -->
+        <rect x="356" y="232" width="48" height="44" rx="6" fill="rgba(134,239,172,0.12)" stroke="rgba(134,239,172,0.40)" stroke-width="1.2"/>
+        <text x="380" y="260" font-size="11" fill="#86efac" text-anchor="middle" font-family="Outfit" font-weight="700">AI</text>
+        <!-- lines like document/chip pins -->
+        <g stroke="rgba(134,239,172,0.55)" stroke-width="1.5" stroke-linecap="round">
+          <line x1="348" y1="246" x2="356" y2="246"/>
+          <line x1="348" y1="256" x2="356" y2="256"/>
+          <line x1="404" y1="246" x2="412" y2="246"/>
+          <line x1="404" y1="256" x2="412" y2="256"/>
+        </g>
+        <!-- bar chart lines in panel -->
+        <g fill="rgba(34,197,94,0.55)">
+          <rect x="418" y="248" width="6" height="30" rx="2"/>
+          <rect x="428" y="256" width="6" height="22" rx="2"/>
+          <rect x="438" y="243" width="6" height="35" rx="2"/>
+          <rect x="448" y="260" width="6" height="18" rx="2"/>
+          <rect x="458" y="252" width="6" height="26" rx="2"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Feature 2: Prescription Analysis — image left, text right -->
+  <div class="feature-row">
+    <div class="feature-img">
+      <!-- Reference: glowing Rx chip/PCB on circuit board with AI label and molecule icons -->
+      <svg viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="bg2" cx="45%" cy="55%" r="55%">
+            <stop offset="0%" stop-color="#16a34a" stop-opacity="0.32"/>
+            <stop offset="100%" stop-color="#052818" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="glow3"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <linearGradient id="chipGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#22c55e" stop-opacity="0.30"/>
+            <stop offset="100%" stop-color="#00e5c3" stop-opacity="0.20"/>
+          </linearGradient>
+        </defs>
+        <rect width="500" height="320" fill="#041f14" rx="20"/>
+        <rect width="500" height="320" fill="url(#bg2)" rx="20"/>
+
+        <!-- circuit board grid lines (horizontal) -->
+        <g stroke="rgba(134,239,172,0.10)" stroke-width="1">
+          <line x1="0" y1="64"  x2="500" y2="64"/>
+          <line x1="0" y1="128" x2="500" y2="128"/>
+          <line x1="0" y1="192" x2="500" y2="192"/>
+          <line x1="0" y1="256" x2="500" y2="256"/>
+          <line x1="80"  y1="0" x2="80"  y2="320"/>
+          <line x1="160" y1="0" x2="160" y2="320"/>
+          <line x1="240" y1="0" x2="240" y2="320"/>
+          <line x1="320" y1="0" x2="320" y2="320"/>
+          <line x1="400" y1="0" x2="400" y2="320"/>
+        </g>
+
+        <!-- Main Rx Chip — large rectangular chip (like reference image PCB) -->
+        <rect x="130" y="80" width="240" height="160" rx="14" fill="url(#chipGrad)" stroke="rgba(134,239,172,0.50)" stroke-width="2"/>
+        <!-- chip inner detail frame -->
+        <rect x="148" y="96" width="204" height="128" rx="8" fill="rgba(34,197,94,0.06)" stroke="rgba(134,239,172,0.20)" stroke-width="1"/>
+        <!-- Rx text on chip -->
+        <text x="215" y="175" font-size="52" fill="rgba(134,239,172,0.22)" font-family="Outfit" font-weight="800" font-style="italic">Rx</text>
+        <!-- chip signature line -->
+        <path d="M175 210 Q205 195 235 210 Q265 225 295 210 Q315 200 325 210" stroke="rgba(134,239,172,0.40)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <!-- horizontal text lines on chip (like prescription lines) -->
+        <g stroke="rgba(134,239,172,0.18)" stroke-width="1.2" stroke-linecap="round">
+          <line x1="160" y1="118" x2="340" y2="118"/>
+          <line x1="160" y1="130" x2="310" y2="130"/>
+          <line x1="160" y1="142" x2="325" y2="142"/>
+        </g>
+
+        <!-- chip pins left -->
+        <g stroke="rgba(134,239,172,0.55)" stroke-width="2" stroke-linecap="round">
+          <line x1="130" y1="104" x2="110" y2="104"/>
+          <line x1="130" y1="120" x2="110" y2="120"/>
+          <line x1="130" y1="136" x2="110" y2="136"/>
+          <line x1="130" y1="152" x2="110" y2="152"/>
+          <line x1="130" y1="168" x2="110" y2="168"/>
+          <line x1="130" y1="184" x2="110" y2="184"/>
+          <line x1="130" y1="200" x2="110" y2="200"/>
+          <line x1="130" y1="216" x2="110" y2="216"/>
+        </g>
+        <!-- chip pins right -->
+        <g stroke="rgba(134,239,172,0.55)" stroke-width="2" stroke-linecap="round">
+          <line x1="370" y1="104" x2="390" y2="104"/>
+          <line x1="370" y1="120" x2="390" y2="120"/>
+          <line x1="370" y1="136" x2="390" y2="136"/>
+          <line x1="370" y1="152" x2="390" y2="152"/>
+          <line x1="370" y1="168" x2="390" y2="168"/>
+          <line x1="370" y1="184" x2="390" y2="184"/>
+          <line x1="370" y1="200" x2="390" y2="200"/>
+          <line x1="370" y1="216" x2="390" y2="216"/>
+        </g>
+        <!-- chip pins bottom -->
+        <g stroke="rgba(134,239,172,0.55)" stroke-width="2" stroke-linecap="round">
+          <line x1="170" y1="240" x2="170" y2="260"/>
+          <line x1="200" y1="240" x2="200" y2="260"/>
+          <line x1="230" y1="240" x2="230" y2="260"/>
+          <line x1="260" y1="240" x2="260" y2="260"/>
+          <line x1="290" y1="240" x2="290" y2="260"/>
+          <line x1="320" y1="240" x2="320" y2="260"/>
+        </g>
+
+        <!-- AI label badge top-right (like reference) -->
+        <rect x="358" y="32" width="52" height="28" rx="8" fill="rgba(34,197,94,0.18)" stroke="rgba(134,239,172,0.45)" stroke-width="1.5"/>
+        <text x="384" y="51" font-size="13" fill="#86efac" text-anchor="middle" font-family="Outfit" font-weight="800">AI</text>
+        <line x1="370" y1="60" x2="370" y2="80" stroke="rgba(134,239,172,0.35)" stroke-width="1.2"/>
+
+        <!-- molecule cluster top-left (like reference) -->
+        <g filter="url(#glow3)">
+          <circle cx="52"  cy="68"  r="6" fill="#22c55e" opacity="0.80"/>
+          <circle cx="28"  cy="52"  r="4" fill="#86efac" opacity="0.70"/>
+          <circle cx="36"  cy="88"  r="4" fill="#86efac" opacity="0.70"/>
+          <circle cx="72"  cy="52"  r="4" fill="#00e5c3" opacity="0.70"/>
+        </g>
+        <g stroke="rgba(134,239,172,0.40)" stroke-width="1.5">
+          <line x1="52" y1="68" x2="28" y2="52"/>
+          <line x1="52" y1="68" x2="36" y2="88"/>
+          <line x1="52" y1="68" x2="72" y2="52"/>
+          <line x1="28" y1="52" x2="72" y2="52"/>
+        </g>
+
+        <!-- capsule/pill icon bottom-right (like reference) -->
+        <g filter="url(#glow3)" opacity="0.80">
+          <rect x="418" y="218" width="48" height="22" rx="11" fill="rgba(134,239,172,0.15)" stroke="rgba(134,239,172,0.50)" stroke-width="1.5"/>
+          <line x1="442" y1="218" x2="442" y2="240" stroke="rgba(134,239,172,0.40)" stroke-width="1.2"/>
+          <rect x="418" y="218" width="24" height="22" rx="11" fill="rgba(34,197,94,0.20)"/>
+        </g>
+
+        <!-- small molecule cluster bottom-left -->
+        <g opacity="0.55">
+          <circle cx="45"  cy="268" r="5" fill="#86efac"/>
+          <circle cx="68"  cy="252" r="4" fill="#22c55e"/>
+          <circle cx="72"  cy="278" r="3.5" fill="#00e5c3"/>
+          <circle cx="28"  cy="255" r="3.5" fill="#86efac"/>
+        </g>
+        <g stroke="rgba(134,239,172,0.30)" stroke-width="1.2">
+          <line x1="45" y1="268" x2="68" y2="252"/>
+          <line x1="45" y1="268" x2="72" y2="278"/>
+          <line x1="45" y1="268" x2="28" y2="255"/>
+        </g>
+
+        <!-- corner glow dots -->
+        <circle cx="110" cy="88"  r="4" fill="#22c55e" opacity="0.60"/>
+        <circle cx="110" cy="232" r="4" fill="#22c55e" opacity="0.60"/>
+        <circle cx="390" cy="88"  r="4" fill="#22c55e" opacity="0.60"/>
+        <circle cx="390" cy="232" r="4" fill="#22c55e" opacity="0.60"/>
+      </svg>
+    </div>
+    <div class="feature-card">
+      <!-- Document/file icon matching reference (pink document icon) -->
+      <div class="icon-steth">
+        <svg width="58" height="58" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- document body -->
+          <rect x="10" y="6" width="32" height="42" rx="5" fill="rgba(236,72,153,0.15)" stroke="#ec4899" stroke-width="2.5"/>
+          <!-- folded corner -->
+          <path d="M32 6 L42 16 L32 16 Z" fill="rgba(236,72,153,0.25)" stroke="#ec4899" stroke-width="1.5" stroke-linejoin="round"/>
+          <!-- lines inside document -->
+          <line x1="16" y1="24" x2="36" y2="24" stroke="#ec4899" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+          <line x1="16" y1="32" x2="36" y2="32" stroke="#ec4899" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+          <line x1="16" y1="40" x2="28" y2="40" stroke="#ec4899" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+          <!-- small dot accent -->
+          <circle cx="47" cy="46" r="4" fill="#ec4899" opacity="0.75"/>
+        </svg>
+      </div>
+      <div class="feature-title">Prescription Analysis</div>
+      <p class="feature-desc">Upload a prescription PDF. Our RAG-supported AI analyzes it for dosage safety, potential allergic reactions, and drug interactions based on your profile.</p>
+    </div>
+  </div>
+
+  <!-- Feature 3: Downloadable Reports — text left, galaxy image right -->
+  <div class="feature-row">
+    <div class="feature-card">
+      <!-- Download arrow icon matching reference (pink download arrow in square frame) -->
+      <div class="icon-steth">
+        <svg width="58" height="58" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- outer rounded square frame -->
+          <rect x="4" y="4" width="50" height="50" rx="12" fill="rgba(236,72,153,0.10)" stroke="#ec4899" stroke-width="2.2"/>
+          <!-- download arrow shaft -->
+          <line x1="29" y1="14" x2="29" y2="36" stroke="#ec4899" stroke-width="3" stroke-linecap="round"/>
+          <!-- arrow head -->
+          <polyline points="18,28 29,40 40,28" stroke="#ec4899" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <!-- base tray line -->
+          <line x1="16" y1="46" x2="42" y2="46" stroke="#ec4899" stroke-width="2.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="feature-title">Downloadable Reports</div>
+      <p class="feature-desc">Every diagnosis session generates a comprehensive, downloadable PDF report with your symptoms, AI analysis, possible conditions, and recommended next steps.</p>
+    </div>
+    <div class="feature-img">
+      <!-- Reference: glowing AI processor/chip with neon green/teal edges, floating in space -->
+      <svg viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="chipBg" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#22c55e" stop-opacity="0.20"/>
+            <stop offset="60%"  stop-color="#064e2b" stop-opacity="0.15"/>
+            <stop offset="100%" stop-color="#030f08" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="chipGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#86efac" stop-opacity="0.55"/>
+            <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="glow4"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="glow5"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <linearGradient id="edgeGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stop-color="#22c55e" stop-opacity="0"/>
+            <stop offset="30%"  stop-color="#86efac" stop-opacity="1"/>
+            <stop offset="70%"  stop-color="#00e5c3" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+          </linearGradient>
+          <linearGradient id="edgeGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%"   stop-color="#22c55e" stop-opacity="0"/>
+            <stop offset="30%"  stop-color="#86efac" stop-opacity="1"/>
+            <stop offset="70%"  stop-color="#00e5c3" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <rect width="500" height="320" fill="#030f08" rx="20"/>
+        <!-- background glow -->
+        <ellipse cx="250" cy="160" rx="200" ry="140" fill="url(#chipBg)"/>
+
+        <!-- floating particles/stars -->
+        <g fill="#86efac" opacity="0.40">
+          <circle cx="42"  cy="38"  r="1.5"/><circle cx="120" cy="22"  r="1"/>
+          <circle cx="200" cy="44"  r="1.5"/><circle cx="310" cy="18"  r="1"/>
+          <circle cx="430" cy="30"  r="1.5"/><circle cx="468" cy="70"  r="1"/>
+          <circle cx="30"  cy="110" r="1"/>  <circle cx="478" cy="150" r="1.5"/>
+          <circle cx="22"  cy="210" r="1"/>  <circle cx="488" cy="260" r="1"/>
+          <circle cx="55"  cy="290" r="1.5"/><circle cx="440" cy="300" r="1"/>
+          <circle cx="155" cy="285" r="1"/>  <circle cx="360" cy="292" r="1.5"/>
+          <circle cx="78"  cy="155" r="1"/>  <circle cx="418" cy="85"  r="1"/>
+        </g>
+
+        <!-- main AI processor chip body -->
+        <rect x="138" y="78" width="224" height="164" rx="18" fill="rgba(20,50,30,0.80)" stroke="none"/>
+        <!-- chip border glow -->
+        <rect x="138" y="78" width="224" height="164" rx="18" fill="none" stroke="rgba(134,239,172,0.22)" stroke-width="2"/>
+
+        <!-- Glowing neon edges (like reference image colored edges) -->
+        <!-- top edge -->
+        <rect x="138" y="76" width="224" height="4" rx="2" fill="url(#edgeGrad1)" opacity="0.90" filter="url(#glow4)"/>
+        <!-- bottom edge -->
+        <rect x="138" y="240" width="224" height="4" rx="2" fill="url(#edgeGrad1)" opacity="0.90" filter="url(#glow4)"/>
+        <!-- left edge -->
+        <rect x="136" y="78" width="4" height="164" rx="2" fill="url(#edgeGrad2)" opacity="0.90" filter="url(#glow4)"/>
+        <!-- right edge -->
+        <rect x="360" y="78" width="4" height="164" rx="2" fill="url(#edgeGrad2)" opacity="0.90" filter="url(#glow4)"/>
+
+        <!-- corner accent dots -->
+        <g filter="url(#glow4)">
+          <circle cx="138" cy="78"  r="5" fill="#86efac" opacity="0.90"/>
+          <circle cx="362" cy="78"  r="5" fill="#86efac" opacity="0.90"/>
+          <circle cx="138" cy="242" r="5" fill="#00e5c3" opacity="0.90"/>
+          <circle cx="362" cy="242" r="5" fill="#00e5c3" opacity="0.90"/>
+        </g>
+
+        <!-- chip inner circuit pattern -->
+        <g stroke="rgba(134,239,172,0.12)" stroke-width="1">
+          <line x1="155" y1="100" x2="345" y2="100"/>
+          <line x1="155" y1="220" x2="345" y2="220"/>
+          <line x1="200" y1="82"  x2="200" y2="238"/>
+          <line x1="300" y1="82"  x2="300" y2="238"/>
+        </g>
+
+        <!-- inner chip body (slightly raised look) -->
+        <rect x="175" y="105" width="150" height="110" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(134,239,172,0.25)" stroke-width="1.5"/>
+
+        <!-- AI text centered on chip -->
+        <text x="250" y="172" font-size="54" fill="none" stroke="rgba(134,239,172,0.60)" stroke-width="1.5" text-anchor="middle" font-family="Outfit" font-weight="800" letter-spacing="2" filter="url(#glow4)">AI</text>
+        <text x="250" y="172" font-size="54" fill="rgba(134,239,172,0.18)" text-anchor="middle" font-family="Outfit" font-weight="800" letter-spacing="2">AI</text>
+
+        <!-- chip pins top -->
+        <g stroke="rgba(134,239,172,0.55)" stroke-width="2" stroke-linecap="round" filter="url(#glow4)">
+          <line x1="178" y1="78" x2="178" y2="62"/>
+          <line x1="202" y1="78" x2="202" y2="62"/>
+          <line x1="226" y1="78" x2="226" y2="62"/>
+          <line x1="250" y1="78" x2="250" y2="62"/>
+          <line x1="274" y1="78" x2="274" y2="62"/>
+          <line x1="298" y1="78" x2="298" y2="62"/>
+          <line x1="322" y1="78" x2="322" y2="62"/>
+          <line x1="346" y1="78" x2="346" y2="62"/>
+        </g>
+        <!-- chip pins bottom -->
+        <g stroke="rgba(0,229,195,0.55)" stroke-width="2" stroke-linecap="round" filter="url(#glow4)">
+          <line x1="178" y1="242" x2="178" y2="258"/>
+          <line x1="202" y1="242" x2="202" y2="258"/>
+          <line x1="226" y1="242" x2="226" y2="258"/>
+          <line x1="250" y1="242" x2="250" y2="258"/>
+          <line x1="274" y1="242" x2="274" y2="258"/>
+          <line x1="298" y1="242" x2="298" y2="258"/>
+          <line x1="322" y1="242" x2="322" y2="258"/>
+          <line x1="346" y1="242" x2="346" y2="258"/>
+        </g>
+        <!-- chip pins left -->
+        <g stroke="rgba(134,239,172,0.55)" stroke-width="2" stroke-linecap="round" filter="url(#glow4)">
+          <line x1="138" y1="106" x2="122" y2="106"/>
+          <line x1="138" y1="130" x2="122" y2="130"/>
+          <line x1="138" y1="154" x2="122" y2="154"/>
+          <line x1="138" y1="178" x2="122" y2="178"/>
+          <line x1="138" y1="202" x2="122" y2="202"/>
+          <line x1="138" y1="226" x2="122" y2="226"/>
+        </g>
+        <!-- chip pins right -->
+        <g stroke="rgba(0,229,195,0.55)" stroke-width="2" stroke-linecap="round" filter="url(#glow4)">
+          <line x1="362" y1="106" x2="378" y2="106"/>
+          <line x1="362" y1="130" x2="378" y2="130"/>
+          <line x1="362" y1="154" x2="378" y2="154"/>
+          <line x1="362" y1="178" x2="378" y2="178"/>
+          <line x1="362" y1="202" x2="378" y2="202"/>
+          <line x1="362" y1="226" x2="378" y2="226"/>
+        </g>
+
+        <!-- scattered glowing dots around chip -->
+        <g filter="url(#glow4)" opacity="0.75">
+          <circle cx="68"  cy="82"  r="3.5" fill="#22c55e"/>
+          <circle cx="92"  cy="62"  r="2.5" fill="#86efac"/>
+          <circle cx="52"  cy="190" r="3"   fill="#00e5c3"/>
+          <circle cx="88"  cy="250" r="2.5" fill="#22c55e"/>
+          <circle cx="432" cy="72"  r="3"   fill="#86efac"/>
+          <circle cx="458" cy="112" r="2.5" fill="#00e5c3"/>
+          <circle cx="448" cy="238" r="3.5" fill="#22c55e"/>
+          <circle cx="410" cy="278" r="2.5" fill="#86efac"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TECHNOLOGIES ══ -->
+<section id="technologies">
+  <h2 class="section-title">Technologies We Use</h2>
+  <div class="section-underline"></div>
+
+  <!-- Row 1 — 4 cards -->
+  <div class="tech-grid">
+    <div class="tech-card"><span class="tech-icon">🐍</span><div class="tech-name">Python &amp; Flask</div><div class="tech-desc">Robust and scalable backend foundation</div></div>
+    <div class="tech-card"><span class="tech-icon">🦙</span><div class="tech-name">Ollama &amp; LLMs</div><div class="tech-desc">Powering our intelligent conversational AI</div></div>
+    <div class="tech-card"><span class="tech-icon">🔗</span><div class="tech-name">LangChain</div><div class="tech-desc">Memory, chains, and RAG workflows</div></div>
+    <div class="tech-card"><span class="tech-icon">💊</span><div class="tech-name">OpenFDA API</div><div class="tech-desc">Real drug safety &amp; interaction data</div></div>
+  </div>
+  <div class="tech-grid-row2">
+    <div class="tech-card"><span class="tech-icon">🎤</span><div class="tech-name">Web Speech API</div><div class="tech-desc">Voice input in Hindi, Odia &amp; more</div></div>
+    <div class="tech-card"><span class="tech-icon">🌐</span><div class="tech-name">Google Translate</div><div class="tech-desc">Seamless multi-language support</div></div>
+  </div>
+</section>
+
+<!-- ══ OUR MISSION — two-column alternating timeline (images 7 & 8) ══ -->
+<section id="our-mission">
+  <h2 class="section-title">
+    Why SehatSathi AI Matters
+  </h2>
+  <div class="section-underline"></div>
+  <div class="mission-layout">
+    <!-- LEFT COLUMN -->
+    <div class="mission-left">
+      <!-- CARD 1 -->
+      <div class="mission-card">
+        <div class="mission-tag">
+          The Problem
+        </div>
+        <div class="mission-heading">
+          Lack of Access
+        </div>
+        <p class="mission-text">
+          In many parts of India, immediate access to medical advice is a challenge,
+          leading to delayed care and self-medication risks.
+        </p>
+      </div>
+
+      <!-- CARD 2 -->
+      <div class="mission-card">
+        <div class="mission-tag">
+          The Solution
+        </div>
+        <div class="mission-heading">
+          AI as a First Doctor
+        </div>
+        <p class="mission-text">
+          SehatSathi AI acts as a virtual doctor,
+          offering instant guidance for non-emergency situations
+          and flagging potential risks in prescriptions.
+        </p>
+      </div>
+    </div>
+
+    <!-- CENTER LINE -->
+
+    <div class="mission-center">
+
+      <div class="m-dot"></div>
+      <div class="m-line"></div>
+
+      <div class="m-dot"></div>
+      <div class="m-line"></div>
+
+      <div class="m-dot"></div>
+      <div class="m-line"></div>
+
+      <div class="m-dot"></div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="mission-right">
+      <!-- CARD 3 -->
+      <div class="mission-card">
+        <div class="mission-tag">
+          Our Mission
+        </div>
+        <div class="mission-heading">
+          Empowerment
+        </div>
+        <p class="mission-text">
+          To provide a safe, reliable, and accessible first point
+          of contact for healthcare queries,
+          empowering users to make informed decisions.
+        </p>
+      </div>
+
+      <!-- CARD 4 -->
+      <div class="mission-card">
+        <div class="mission-tag">
+          The Impact
+        </div>
+        <div class="mission-heading">
+          Safer Healthcare
+        </div>
+        <p class="mission-text">
+          By promoting awareness and providing data-driven suggestions,
+          we aim to reduce medication errors
+          and encourage timely professional consultation.
+        </p>
+      </div>
+    </div>
+
+    <!-- DECORATIVE DIAMOND -->
+    <div class="mission-diamond"></div>
+  </div>
+</section>
+
+<!-- ══ ABOUT ══ -->
+<section id="about">
+  <h2 class="section-title" style="color:var(--green-light);">About SehatSathi AI</h2>
+  <div class="section-underline"></div>
+  <div class="about-grid">
+    <div class="about-card">
+      <div class="about-title">About SehatSathi AI</div>
+      <p class="about-text">SehatSathi AI ("Health Companion AI") is an innovative project designed to bridge the gap in primary healthcare access. Leveraging the power of large language models and retrieval-augmented generation, we offer a comprehensive safety net for initial medical queries.</p>
+      <p class="about-text">Our goal is to make healthcare guidance more accessible and safer for everyone, from bustling cities to remote villages.</p>
+    </div>
+    <div class="team-card">
+      <div class="team-title">Meet the Team</div>
+      <div class="team-grid">
+        <div class="team-member"><div class="member-badge">👤 Team Member 1</div><div class="member-name">[Your Name]</div><div class="member-role">Project Lead</div></div>
+        <div class="team-member"><div class="member-badge">👤 Team Member 2</div><div class="member-name">[Member's Name]</div><div class="member-role">Backend Developer</div></div>
+        <div class="team-member team-single"><div class="member-badge">👤 Team Member 3</div><div class="member-name">[Member's Name]</div><div class="member-role">UI/UX Designer</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>&copy; 2026 <span>SehatSathi AI</span>. Built for India's Healthcare Future.</footer>
+
+<script>
+  function setActive(el) {
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+    el.classList.add('active');
+  }
+  const sections = document.querySelectorAll('section');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let cur = '';
+    sections.forEach(s => { 
+      if (window.scrollY >= s.offsetTop - 200)
+       cur = s.id; 
+      });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      const href = a.getAttribute('href');
+      if (href === '#' + cur) a.classList.add('active');
+    });
+
+     /* Mission cards animation */
+    const missionCards = document.querySelectorAll('.mission-card');
+    missionCards.forEach(card => {
+      const cardTop = card.getBoundingClientRect().top;
+      if (cardTop < window.innerHeight - 100) {
+        card.classList.add('show');
+      }
+    });
+
+  });
+</script>
+</body>
+</html>
